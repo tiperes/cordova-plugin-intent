@@ -202,20 +202,6 @@ public class IntentShim extends CordovaPlugin {
             callbackContext.sendPluginResult(result);
             return true;
         }
-        else if (action.equals("onActivityResult"))
-        {
-            if (args.length() != 1) {
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
-                return false;
-            }
-
-            this.onActivityResultCallbackContext = callbackContext;
-
-            PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
-            result.setKeepCallback(true);
-            callbackContext.sendPluginResult(result);
-            return true;
-        }
         else if (action.equals("getIntent"))
         {
             //  Credit: https://github.com/napolitano/cordova-plugin-intent
@@ -241,44 +227,23 @@ public class IntentShim extends CordovaPlugin {
         {
             //  Assuming this application was started with startActivityForResult, send the result back
             //  https://github.com/darryncampbell/darryncampbell-cordova-plugin-intent/issues/3
+            
+            // tiperes: Normalized parameters processing based in a Intent object, allowing full customization of the result intent to send.
+            int resultCode = Activity.RESULT_OK;
             Intent result = new Intent();
-            if (args.length() > 0) {
-                JSONObject json = args.getJSONObject(0);
-                JSONObject extras = (json.has("extras")) ? json.getJSONObject("extras") : null;
-
-                // Populate the extras if any exist
-                if (extras != null) {
-                    JSONArray extraNames = extras.names();
-                    for (int i = 0; i < extraNames.length(); i++) {
-                        String key = extraNames.getString(i);
-                        Object extrasObj = extras.get(key);
-                        if (extrasObj instanceof JSONObject) {
-                            //  The extra is a bundle
-                            result.putExtra(key, toBundle((JSONObject) extras.get(key)));
-                        } else if (extrasObj instanceof Boolean) {
-                            result.putExtra(key, extras.getBoolean(key));
-                        } else if (extrasObj instanceof Integer) {
-                            result.putExtra(key, extras.getInt(key));
-                        } else if (extrasObj instanceof Long) {
-                            result.putExtra(key, extras.getLong(key));
-                        } else if (extrasObj instanceof Double) {
-                            result.putExtra(key, extras.getDouble(key));
-                        } else if (extrasObj instanceof Float) {
-                            result.putExtra(key, extras.getDouble(key));
-                        } else {
-                            result.putExtra(key, extras.getString(key));
-                        }
-                    }
-                }
-            }
-
+            
+            if (args.length() == 1) {
+                JSONObject obj = args.getJSONObject(0);
+                resultCode = obj.has("resultCode") ? obj.getInt("resultCode") : Activity.RESULT_OK;
+                intent = populateIntent(obj, callbackContext);
+            }            
+            
             //set result
-            cordova.getActivity().setResult(Activity.RESULT_OK, result);
+            cordova.getActivity().setResult(resultCode, result);
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
 
             //finish the activity
             cordova.getActivity().finish();
-
         }
         else if (action.equals("realPathFromUri"))
         {
@@ -591,6 +556,8 @@ public class IntentShim extends CordovaPlugin {
                     i.putExtra(key, Long.valueOf(valueStr));
                 } else if (value instanceof Double) {
                     i.putExtra(key, Double.valueOf(valueStr));
+                } else if (value instanceof Float) {
+                    i.putExtra(key, Float.valueOf(valueStr));
                 } else {
                     i.putExtra(key, valueStr);
                 }
