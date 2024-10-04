@@ -9,6 +9,8 @@
 # Changes
 - Support for [MABS10](https://success.outsystems.com/support/release_notes/mobile_apps_build_service_versions/mabs_10_release_notes/)
     - Reviewed plugin.xml, namely File Provider configuration, based on https://developer.android.com/training/secure-file-sharing/setup-sharing
+- "onActivityResult" - Purged function since it does not bring any additional value diferent from "onIntent".
+- "sendResult" - Normalized parameters processing based in a Intent object, allowing full customization of the result intent to send.
 
 # Credits
 All credits to [darryncampbell](https://github.com/darryncampbell).
