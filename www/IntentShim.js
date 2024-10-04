@@ -64,11 +64,6 @@ IntentShim.prototype.onIntent = function (callback) {
     exec(callback, null, "IntentShim", "onIntent", [callback]);
 };
 
-IntentShim.prototype.onActivityResult = function (callback) {
-    argscheck.checkArgs('f', 'IntentShim.onActivityResult', arguments);
-    exec(callback, null, "IntentShim", "onActivityResult", [callback]);
-};
-
 IntentShim.prototype.getIntent = function (successCallback, failureCallback) {
     argscheck.checkArgs('ff', 'IntentShim.getIntent', arguments);
     exec(successCallback, failureCallback, "IntentShim", "getIntent", []);
