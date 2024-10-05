@@ -11,6 +11,7 @@
     - Reviewed plugin.xml, namely File Provider configuration, based on https://developer.android.com/training/secure-file-sharing/setup-sharing
 - "onActivityResult" - Purged function since it does not bring any additional value diferent from "onIntent".
 - "sendResult" - Normalized parameters processing based in a Intent object, allowing full customization of the result intent to send.
+- Reviewed internal serialzation action "populateIntent", to support multiple extra entries with Object values that will be serialized as a Bundle.
 
 # Credits
 All credits to [darryncampbell](https://github.com/darryncampbell).
