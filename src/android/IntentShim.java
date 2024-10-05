@@ -447,25 +447,6 @@ public class IntentShim extends CordovaPlugin {
             }
         }
 
-        JSONObject extras = obj.has("extras") ? obj.getJSONObject("extras") : null;
-        Map<String, Object> extrasMap = new HashMap<String, Object>();
-        JSONObject extrasObject = null;
-        String extrasKey = "";
-        if (extras != null) {
-            JSONArray extraNames = extras.names();
-            for (int i = 0; i < extraNames.length(); i++) {
-                String key = extraNames.getString(i);
-                Object extrasObj = extras.get(key);
-                if (extrasObj instanceof JSONObject) {
-                    //  The extra is a bundle
-                    extrasKey = key;
-                    extrasObject = (JSONObject) extras.get(key);
-                } else {
-                    extrasMap.put(key, extras.get(key));
-                }
-            }
-        }
-
         String action = obj.has("action") ? obj.getString("action") : null;
         Intent i = new Intent();
         if (action != null)
@@ -514,52 +495,59 @@ public class IntentShim extends CordovaPlugin {
             }
         }
 
-        if (extrasObject != null)
-            addSerializable(i, extrasKey, extrasObject);
-
-        for (String key : extrasMap.keySet()) {
-            Object value = extrasMap.get(key);
-            String valueStr = String.valueOf(value);
-            // If type is text html, the extra text must sent as HTML
-            if (key.equals(Intent.EXTRA_TEXT) && type.equals("text/html")) {
-                i.putExtra(key, Html.fromHtml(valueStr));
-            } else if (key.equals(Intent.EXTRA_STREAM)) {
-                // allows sharing of images as attachments.
-                // value in this case should be a URI of a file
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && valueStr.startsWith("file://"))
-                {
-                    Uri uriOfStream = remapUriWithFileProvider(valueStr, callbackContext);
-                    if (uriOfStream != null)
-                        i.putExtra(key, uriOfStream);
-                }
-                else
-                {
-                    //final CordovaResourceApi resourceApi = webView.getResourceApi();
-                    i.putExtra(key, resourceApi.remapUri(Uri.parse(valueStr)));
-                }
-            } else if (key.equals(Intent.EXTRA_EMAIL)) {
-                // allows to add the email address of the receiver
-                i.putExtra(Intent.EXTRA_EMAIL, new String[] { valueStr });
-            } else if (key.equals(Intent.EXTRA_KEY_EVENT)) {
-                // allows to add a key event object
-                JSONObject keyEventJson = new JSONObject(valueStr);
-                int keyAction = keyEventJson.getInt("action");
-                int keyCode = keyEventJson.getInt("code");
-                KeyEvent keyEvent = new KeyEvent(keyAction, keyCode);
-                i.putExtra(Intent.EXTRA_KEY_EVENT, keyEvent);
-            } else {
-                if (value instanceof Boolean) {
-                    i.putExtra(key, Boolean.valueOf(valueStr));
-                } else if (value instanceof Integer) {
-                    i.putExtra(key, Integer.valueOf(valueStr));
-                } else if (value instanceof Long) {
-                    i.putExtra(key, Long.valueOf(valueStr));
-                } else if (value instanceof Double) {
-                    i.putExtra(key, Double.valueOf(valueStr));
-                } else if (value instanceof Float) {
-                    i.putExtra(key, Float.valueOf(valueStr));
+        JSONObject extras = obj.has("extras") ? obj.getJSONObject("extras") : null;
+        if (extras != null) {
+            JSONArray extraNames = extras.names();
+            for (int i = 0; i < extraNames.length(); i++) {
+                String key = extraNames.getString(i);
+                Object value = extras.get(key);
+                if (value instanceof JSONObject) {
+                    //  The extra is a bundle
+                    addSerializable(i, key, (JSONObject) value);
                 } else {
-                    i.putExtra(key, valueStr);
+					String valueStr = String.valueOf(value);
+					// If type is text html, the extra text must sent as HTML
+					if (key.equals(Intent.EXTRA_TEXT) && type.equals("text/html")) {
+						i.putExtra(key, Html.fromHtml(valueStr));
+					} else if (key.equals(Intent.EXTRA_STREAM)) {
+						// allows sharing of images as attachments.
+						// value in this case should be a URI of a file
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && valueStr.startsWith("file://"))
+						{
+							Uri uriOfStream = remapUriWithFileProvider(valueStr, callbackContext);
+							if (uriOfStream != null)
+								i.putExtra(key, uriOfStream);
+						}
+						else
+						{
+							//final CordovaResourceApi resourceApi = webView.getResourceApi();
+							i.putExtra(key, resourceApi.remapUri(Uri.parse(valueStr)));
+						}
+					} else if (key.equals(Intent.EXTRA_EMAIL)) {
+						// allows to add the email address of the receiver
+						i.putExtra(Intent.EXTRA_EMAIL, new String[] { valueStr });
+					} else if (key.equals(Intent.EXTRA_KEY_EVENT)) {
+						// allows to add a key event object
+						JSONObject keyEventJson = new JSONObject(valueStr);
+						int keyAction = keyEventJson.getInt("action");
+						int keyCode = keyEventJson.getInt("code");
+						KeyEvent keyEvent = new KeyEvent(keyAction, keyCode);
+						i.putExtra(Intent.EXTRA_KEY_EVENT, keyEvent);
+					} else {
+						if (value instanceof Boolean) {
+							i.putExtra(key, Boolean.valueOf(valueStr));
+						} else if (value instanceof Integer) {
+							i.putExtra(key, Integer.valueOf(valueStr));
+						} else if (value instanceof Long) {
+							i.putExtra(key, Long.valueOf(valueStr));
+						} else if (value instanceof Double) {
+							i.putExtra(key, Double.valueOf(valueStr));
+						} else if (value instanceof Float) {
+							i.putExtra(key, Float.valueOf(valueStr));
+						} else {
+							i.putExtra(key, valueStr);
+						}
+					}
                 }
             }
         }
