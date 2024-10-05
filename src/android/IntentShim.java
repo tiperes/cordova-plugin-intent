@@ -505,49 +505,49 @@ public class IntentShim extends CordovaPlugin {
                     //  The extra is a bundle
                     addSerializable(i, key, (JSONObject) value);
                 } else {
-					String valueStr = String.valueOf(value);
-					// If type is text html, the extra text must sent as HTML
-					if (key.equals(Intent.EXTRA_TEXT) && type.equals("text/html")) {
-						i.putExtra(key, Html.fromHtml(valueStr));
-					} else if (key.equals(Intent.EXTRA_STREAM)) {
-						// allows sharing of images as attachments.
-						// value in this case should be a URI of a file
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && valueStr.startsWith("file://"))
-						{
-							Uri uriOfStream = remapUriWithFileProvider(valueStr, callbackContext);
-							if (uriOfStream != null)
-								i.putExtra(key, uriOfStream);
-						}
-						else
-						{
-							//final CordovaResourceApi resourceApi = webView.getResourceApi();
-							i.putExtra(key, resourceApi.remapUri(Uri.parse(valueStr)));
-						}
-					} else if (key.equals(Intent.EXTRA_EMAIL)) {
-						// allows to add the email address of the receiver
-						i.putExtra(Intent.EXTRA_EMAIL, new String[] { valueStr });
-					} else if (key.equals(Intent.EXTRA_KEY_EVENT)) {
-						// allows to add a key event object
-						JSONObject keyEventJson = new JSONObject(valueStr);
-						int keyAction = keyEventJson.getInt("action");
-						int keyCode = keyEventJson.getInt("code");
-						KeyEvent keyEvent = new KeyEvent(keyAction, keyCode);
-						i.putExtra(Intent.EXTRA_KEY_EVENT, keyEvent);
-					} else {
-						if (value instanceof Boolean) {
-							i.putExtra(key, Boolean.valueOf(valueStr));
-						} else if (value instanceof Integer) {
-							i.putExtra(key, Integer.valueOf(valueStr));
-						} else if (value instanceof Long) {
-							i.putExtra(key, Long.valueOf(valueStr));
-						} else if (value instanceof Double) {
-							i.putExtra(key, Double.valueOf(valueStr));
-						} else if (value instanceof Float) {
-							i.putExtra(key, Float.valueOf(valueStr));
-						} else {
-							i.putExtra(key, valueStr);
-						}
-					}
+                    String valueStr = String.valueOf(value);
+                    // If type is text html, the extra text must sent as HTML
+                    if (key.equals(Intent.EXTRA_TEXT) && type.equals("text/html")) {
+                        i.putExtra(key, Html.fromHtml(valueStr));
+                    } else if (key.equals(Intent.EXTRA_STREAM)) {
+                        // allows sharing of images as attachments.
+                        // value in this case should be a URI of a file
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && valueStr.startsWith("file://"))
+                        {
+                            Uri uriOfStream = remapUriWithFileProvider(valueStr, callbackContext);
+                            if (uriOfStream != null)
+                                i.putExtra(key, uriOfStream);
+                        }
+                        else
+                        {
+                            //final CordovaResourceApi resourceApi = webView.getResourceApi();
+                            i.putExtra(key, resourceApi.remapUri(Uri.parse(valueStr)));
+                        }
+                    } else if (key.equals(Intent.EXTRA_EMAIL)) {
+                        // allows to add the email address of the receiver
+                        i.putExtra(Intent.EXTRA_EMAIL, new String[] { valueStr });
+                    } else if (key.equals(Intent.EXTRA_KEY_EVENT)) {
+                        // allows to add a key event object
+                        JSONObject keyEventJson = new JSONObject(valueStr);
+                        int keyAction = keyEventJson.getInt("action");
+                        int keyCode = keyEventJson.getInt("code");
+                        KeyEvent keyEvent = new KeyEvent(keyAction, keyCode);
+                        i.putExtra(Intent.EXTRA_KEY_EVENT, keyEvent);
+                    } else {
+                        if (value instanceof Boolean) {
+                            i.putExtra(key, Boolean.valueOf(valueStr));
+                        } else if (value instanceof Integer) {
+                            i.putExtra(key, Integer.valueOf(valueStr));
+                        } else if (value instanceof Long) {
+                            i.putExtra(key, Long.valueOf(valueStr));
+                        } else if (value instanceof Double) {
+                            i.putExtra(key, Double.valueOf(valueStr));
+                        } else if (value instanceof Float) {
+                            i.putExtra(key, Float.valueOf(valueStr));
+                        } else {
+                            i.putExtra(key, valueStr);
+                        }
+                    }
                 }
             }
         }
