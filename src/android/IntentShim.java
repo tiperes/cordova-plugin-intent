@@ -126,7 +126,7 @@ public class IntentShim extends CordovaPlugin
                 {
                     //  The arguments are not correct
                     Log.w(LOG_TAG, "filterActions argument is not in the expected format");
-                    throw new IllegalArgumentException("Filter Actions is mandatory", e);
+                    throw new IllegalArgumentException("Filter Actions is mandatory");
                 }
     
                 for (int i = 0; i < filterActions.length(); i++) {
