@@ -553,7 +553,7 @@ public class IntentShim extends CordovaPlugin
         else
         {
             //  Return an error as there is no app to handle this intent
-            throw new RuntimeException("Target package is not installed or no permitions to query.");
+            throw new RuntimeException("Intent package is not installed or not enought permissions to query.");
         }
     }
 
