@@ -253,7 +253,8 @@ public class IntentShim extends CordovaPlugin
                     return false;
                 }
 
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, checkPackageExists(packageName)));
+                boolean packageFound = this.checkPackageExists(packageName);
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, packageFound));
             }
             return true;
         }
