@@ -235,7 +235,7 @@ public class IntentShim extends CordovaPlugin {
             if (args.length() == 1) {
                 JSONObject obj = args.getJSONObject(0);
                 resultCode = obj.has("resultCode") ? obj.getInt("resultCode") : Activity.RESULT_OK;
-                intent = populateIntent(obj, callbackContext);
+                result = populateIntent(obj, callbackContext);
             }            
             
             //set result
