@@ -64,14 +64,14 @@ IntentShim.prototype.onIntent = function (callback) {
     exec(callback, null, "IntentShim", "onIntent", [callback]);
 };
 
-IntentShim.prototype.getIntent = function (successCallback, failureCallback) {
+IntentShim.prototype.getIntent = function (successCallback, errorCallback) {
     argscheck.checkArgs('ff', 'IntentShim.getIntent', arguments);
-    exec(successCallback, failureCallback, "IntentShim", "getIntent", []);
+    exec(successCallback, errorCallback, "IntentShim", "getIntent", []);
 };
 
-IntentShim.prototype.sendResult = function (params, callback) {
-    argscheck.checkArgs('of', 'IntentShim.sendResult', arguments);
-    exec(callback, null, "IntentShim", "sendResult", [params]);
+IntentShim.prototype.sendResult = function (params, successCallback, errorCallback) {
+    argscheck.checkArgs('off', 'IntentShim.sendResult', arguments);
+    exec(successCallback, errorCallback, "IntentShim", "sendResult", [params]);
 }
 
 IntentShim.prototype.realPathFromUri = function (params, successCallback, errorCallback) {
@@ -79,9 +79,9 @@ IntentShim.prototype.realPathFromUri = function (params, successCallback, errorC
     exec(successCallback, errorCallback, "IntentShim", "realPathFromUri", [params]);
 };
 
-IntentShim.prototype.packageExists = function (packageName, successCallback) {
-    argscheck.checkArgs('sf', 'IntentShim.packageExists', arguments);
-    exec(successCallback, null, "IntentShim", "packageExists", [packageName]);
+IntentShim.prototype.packageExists = function (packageName, successCallback, errorCallback) {
+    argscheck.checkArgs('sff', 'IntentShim.packageExists', arguments);
+    exec(successCallback, errorCallback, "IntentShim", "packageExists", [packageName]);
 };
 
 window.intentShim = new IntentShim();
