@@ -278,7 +278,8 @@ public class IntentShim extends CordovaPlugin
             return true;
         }
         catch (PackageManager.NameNotFoundException e) {
-            return false;
+            throw new RuntimeException("Package not installed or not enought permissions to query.", e);
+            //return false;
         }
     }
 
@@ -536,24 +537,14 @@ public class IntentShim extends CordovaPlugin
 
     private void startActivity(Intent intent, boolean bExpectResult, int requestCode, CallbackContext callbackContext)
     {
-        if (intent.resolveActivityInfo(this.cordova.getActivity().getPackageManager(), 0) != null)
-        {
-            if (bExpectResult)
-            {
-                this.onActivityResultCallbackContext = callbackContext;
-                cordova.setActivityResultCallback(this);
-                this.cordova.getActivity().startActivityForResult(intent, requestCode);
-            }
-            else
-            {
-                this.cordova.getActivity().startActivity(intent);
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-            }
+        if (bExpectResult) {
+            this.onActivityResultCallbackContext = callbackContext;
+            cordova.setActivityResultCallback(this);
+            this.cordova.getActivity().startActivityForResult(intent, requestCode);
         }
-        else
-        {
-            //  Return an error as there is no app to handle this intent
-            throw new RuntimeException("Intent package is not installed or not enought permissions to query.");
+        else {
+            this.cordova.getActivity().startActivity(intent);
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
         }
     }
 
