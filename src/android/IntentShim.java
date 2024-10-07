@@ -278,8 +278,15 @@ public class IntentShim extends CordovaPlugin
             return true;
         }
         catch (PackageManager.NameNotFoundException e) {
-            throw new RuntimeException("Package not installed or not enought permissions to query.", e);
-            //return false;
+            return false;
+        }
+    }
+    
+    private boolean resolveActivityPackageOrThrow(Intent intent)
+    {
+        PackageManager packageManager = this.cordova.getActivity().getPackageManager();
+        if (intent.resolveActivityInfo(packageManager, 0) == null) {
+            throw new RuntimeException("Package not found or not enought permissions to query");
         }
     }
 
@@ -370,6 +377,82 @@ public class IntentShim extends CordovaPlugin
         throw new RuntimeException("Requires KITKAT or higher");
     }
 
+    /**
+     * Sends the provided Intent to the onNewIntentCallbackContext.
+     *
+     * @param intent This is the intent to send to the JS layer.
+     */
+    private void fireOnNewIntent(Intent intent)
+    {
+        PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
+        result.setKeepCallback(true);
+        this.onNewIntentCallbackContext.sendPluginResult(result);
+    }
+
+    @Override
+    public void onNewIntent(Intent intent)
+    {
+        if (this.onNewIntentCallbackContext != null) {
+            fireOnNewIntent(intent);
+        } else {
+            // save the intent for use when onIntent action is called in the execute method
+            this.deferredIntent = intent;
+        }
+    }
+
+    private void startActivity(Intent intent, boolean bExpectResult, int requestCode, CallbackContext callbackContext)
+    {
+        resolveActivityPackageOrThrow(intent);
+        if (bExpectResult) {
+            this.onActivityResultCallbackContext = callbackContext;
+            cordova.setActivityResultCallback(this);
+            this.cordova.getActivity().startActivityForResult(intent, requestCode);
+        }
+        else {
+            this.cordova.getActivity().startActivity(intent);
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent)
+    {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (onActivityResultCallbackContext != null && intent != null)
+        {
+            intent.putExtra("requestCode", requestCode);
+            intent.putExtra("resultCode", resultCode);
+            PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
+            result.setKeepCallback(true);
+            onActivityResultCallbackContext.sendPluginResult(result);
+        }
+        else if (onActivityResultCallbackContext != null)
+        {
+            Intent canceledIntent = new Intent();
+            canceledIntent.putExtra("requestCode", requestCode);
+            canceledIntent.putExtra("resultCode", resultCode);
+            PluginResult canceledResult = new PluginResult(PluginResult.Status.OK, getIntentJson(canceledIntent));
+            canceledResult.setKeepCallback(true);
+            onActivityResultCallbackContext.sendPluginResult(canceledResult);
+        }
+    }
+
+    private BroadcastReceiver newBroadcastReceiver() {
+        return new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                CallbackContext onBroadcastCallbackContext = receiverCallbacks.get(this);
+                if (onBroadcastCallbackContext != null)
+                {
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
+                    result.setKeepCallback(true);
+                    onBroadcastCallbackContext.sendPluginResult(result);
+                }
+            }
+        };
+    }
+    
     private Intent populateIntent(JSONObject obj, CallbackContext callbackContext)
     {
         try {
@@ -511,82 +594,7 @@ public class IntentShim extends CordovaPlugin
             throw new RuntimeException("Error deserializing JSON to intent", e);
         }
     }
-
-    /**
-     * Sends the provided Intent to the onNewIntentCallbackContext.
-     *
-     * @param intent This is the intent to send to the JS layer.
-     */
-    private void fireOnNewIntent(Intent intent)
-    {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
-        result.setKeepCallback(true);
-        this.onNewIntentCallbackContext.sendPluginResult(result);
-    }
-
-    @Override
-    public void onNewIntent(Intent intent)
-    {
-        if (this.onNewIntentCallbackContext != null) {
-            fireOnNewIntent(intent);
-        } else {
-            // save the intent for use when onIntent action is called in the execute method
-            this.deferredIntent = intent;
-        }
-    }
-
-    private void startActivity(Intent intent, boolean bExpectResult, int requestCode, CallbackContext callbackContext)
-    {
-        if (bExpectResult) {
-            this.onActivityResultCallbackContext = callbackContext;
-            cordova.setActivityResultCallback(this);
-            this.cordova.getActivity().startActivityForResult(intent, requestCode);
-        }
-        else {
-            this.cordova.getActivity().startActivity(intent);
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent)
-    {
-        super.onActivityResult(requestCode, resultCode, intent);
-        if (onActivityResultCallbackContext != null && intent != null)
-        {
-            intent.putExtra("requestCode", requestCode);
-            intent.putExtra("resultCode", resultCode);
-            PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
-            result.setKeepCallback(true);
-            onActivityResultCallbackContext.sendPluginResult(result);
-        }
-        else if (onActivityResultCallbackContext != null)
-        {
-            Intent canceledIntent = new Intent();
-            canceledIntent.putExtra("requestCode", requestCode);
-            canceledIntent.putExtra("resultCode", resultCode);
-            PluginResult canceledResult = new PluginResult(PluginResult.Status.OK, getIntentJson(canceledIntent));
-            canceledResult.setKeepCallback(true);
-            onActivityResultCallbackContext.sendPluginResult(canceledResult);
-        }
-    }
-
-    private BroadcastReceiver newBroadcastReceiver() {
-        return new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                CallbackContext onBroadcastCallbackContext = receiverCallbacks.get(this);
-                if (onBroadcastCallbackContext != null)
-                {
-                    PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
-                    result.setKeepCallback(true);
-                    onBroadcastCallbackContext.sendPluginResult(result);
-                }
-            }
-        };
-    }
-
+    
     /**
      * Return JSON representation of intent attributes
      *
