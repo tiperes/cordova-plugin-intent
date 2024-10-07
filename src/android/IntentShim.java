@@ -491,7 +491,7 @@ public class IntentShim extends CordovaPlugin {
             int length = flags.length();
             for (int k = 0; k < length; k++)
             {
-                i.addFlags(flags.getInt(k));
+                intent.addFlags(flags.getInt(k));
             }
         }
 
