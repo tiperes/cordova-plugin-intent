@@ -507,7 +507,7 @@ public class IntentShim extends CordovaPlugin
             return intent;
         }
         catch (Exception e) {
-            throw new RuntimeException("Error converting JSON to intent", e);
+            throw new RuntimeException("Error deserializing JSON to intent", e);
         }
     }
 
@@ -553,7 +553,7 @@ public class IntentShim extends CordovaPlugin
         else
         {
             //  Return an error as there is no app to handle this intent
-            throw new RuntimeException("Target package is not installed or not accessible.");
+            throw new RuntimeException("Target package is not installed or no permitions to query.");
         }
     }
 
@@ -635,7 +635,7 @@ public class IntentShim extends CordovaPlugin
 
                     }
                     catch (Exception e) {
-                        throw new IllegalArgumentException("Error converting (KITKAT) intent to JSON", e);
+                        throw new IllegalArgumentException("Error serializing (KITKAT) intent to JSON", e);
                     }
                 }
             }
@@ -662,7 +662,7 @@ public class IntentShim extends CordovaPlugin
             return intentJSON;
         }
         catch (Exception e) {
-            throw new RuntimeException("Error converting intent to JSON", e);
+            throw new RuntimeException("Error serializing intent to JSON", e);
         }
     }
 
@@ -673,7 +673,7 @@ public class IntentShim extends CordovaPlugin
             return (JSONObject) toJsonValue(bundle);
         }
         catch (Exception e) {
-            throw new RuntimeException("Error converting bundle to JSON", e);
+            throw new RuntimeException("Error serializing bundle to JSON", e);
         }
     }
 
@@ -743,7 +743,7 @@ public class IntentShim extends CordovaPlugin
         }
     }
 
-    private Object[] jsonArrayToObjectArray(JSONArray array)
+    private Object[] jsonArrayToObjectArray(JSONArray array) throws JSONException
     {
         List<Object> list = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
@@ -773,11 +773,11 @@ public class IntentShim extends CordovaPlugin
 
     private Bundle toBundle(final JSONObject obj)
     {
-        Bundle returnBundle = new Bundle();
         if (obj == null) {
             return null;
         }
         try {
+            Bundle returnBundle = new Bundle();
             Iterator<?> keys = obj.keys();
             while (keys.hasNext()) {
                 String key = (String)keys.next();
@@ -826,7 +826,7 @@ public class IntentShim extends CordovaPlugin
             return returnBundle;
         }
         catch (Exception e) {
-            throw new RuntimeException("Error converting JSON to Bundle", e);
+            throw new RuntimeException("Error deserializing JSON to Bundle", e);
         }
     }
 }
