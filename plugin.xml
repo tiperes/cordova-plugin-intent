@@ -29,7 +29,7 @@
         </config-file>
         <config-file target="AndroidManifest.xml" platform="android" parent="/manifest/application" mode="merge">
             <provider
-                android:name="androidx.core.content.FileProvider"
+                android:name="com.tiperes.cordova.plugin.intent.CordovaPluginIntentFileProvider"
                 android:authorities="${applicationId}.cordova.plugin.intent.fileprovider"
                 android:exported="false"
                 android:grantUriPermissions="true">
