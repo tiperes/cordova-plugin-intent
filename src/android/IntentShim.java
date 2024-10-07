@@ -335,8 +335,7 @@ public class IntentShim extends CordovaPlugin
                 {
                     //  Could do better here - if the app does not already have permission should
                     //  only continue when we get the success callback from this.
-                    ActivityCompat.requestPermissions(this.cordova.getActivity(),
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                    ActivityCompat.requestPermissions(this.cordova.getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
                     throw new RuntimeException("Please grant read external storage permission");
                 }
                 // Image pick from recent
