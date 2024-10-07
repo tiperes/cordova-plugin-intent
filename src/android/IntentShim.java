@@ -260,7 +260,7 @@ public class IntentShim extends CordovaPlugin
         }
         catch (Exception e) {
             Exception innerExp = e.getCause();
-            var errorMsg = e.getMessage() + (innerExp == null ? "" : innerExp.getMessage());
+            String errorMsg = e.getMessage() + (innerExp == null ? "" : innerExp.getMessage());
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, errorMsg));
             return false;
         }
