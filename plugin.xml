@@ -8,7 +8,7 @@
     <!-- android -->
     <platform name="android">
 	<hook type="after_prepare" src="hooks/android/after_prepare.js" />
-	<hook type="after_plugin_add" src="hooks/android/after_prepare.js" />
+	<hook type="after_plugin_add" src="hooks/android/after_plugin_add.js" />
 	
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="IntentShim" >
