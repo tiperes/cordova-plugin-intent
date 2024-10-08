@@ -20,7 +20,7 @@ function mergeManifests(context) {
     }
     
     const androidPlatformRoot = path.join(context.opts.projectRoot, 'platforms/android');
-    const originalManifestPath = path.join(context.opts.projectRoot, 'app/src/main/AndroidManifest.xml');
+    const originalManifestPath = path.join(androidPlatformRoot, 'app/src/main/AndroidManifest.xml');
     if (!fs.existsSync(originalManifestPath)) {
         console.error('AndroidManifest.xml not found at:', originalManifestPath);
         return;
