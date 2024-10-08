@@ -98,7 +98,7 @@ module.exports = function (context) {
                                 query.intent.forEach(intent => {
                                     if (intent.action) {
                                         intent.action.forEach(action => {
-                                            if (action.$ && action.$['android:name'] === actionName') {
+                                            if (action.$ && action.$['android:name'] === actionName) {
                                                 actionExists = true;
                                             }
                                         });
