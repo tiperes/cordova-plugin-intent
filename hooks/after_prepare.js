@@ -3,8 +3,8 @@ const path = require('path');
 const et = require('elementtree');
 
 // Enable support for AndroidX & Jetifier
-function androidXUpgrade (ctx) {
-    if (!ctx.opts.platforms.includes('android'))
+function androidXUpgrade (context) {
+    if (!context.opts.platforms.includes('android'))
         return;
     
     const androidPlatformRoot = path.join(context.opts.projectRoot, 'platforms/android');
@@ -31,8 +31,8 @@ function androidXUpgrade (ctx) {
 }
 
 // Update Manifest to Whitelisting Android Package Visibility Needs
-function androidPackagesWhitelisting (ctx) {
-    if (!ctx.opts.platforms.includes('android'))
+function androidPackagesWhitelisting (context) {
+    if (!context.opts.platforms.includes('android'))
         return;
     
     const packagesToIncludeCSV = context.opts.cli_variables.CORDOVA_ANDROID_PACKAGES;
@@ -60,7 +60,7 @@ function androidPackagesWhitelisting (ctx) {
     fs.writeFileSync(androidManifestPath, androidManifestXml.write({ indent: 4 }), 'utf-8');
 }
 
-module.exports = function (ctx) {
-    androidXUpgrade(ctx);
-    androidPackagesWhitelisting(ctx);
+module.exports = function (context) {
+    androidXUpgrade(context);
+    androidPackagesWhitelisting(context);
 };
