@@ -8,24 +8,29 @@ function processCordovaVariables (context) {
     const androidManifestPath = path.join(androidPlatformRoot, 'app/src/main/AndroidManifest.xml');
     
     // Init AndroidManifest control
+    console.log('processCordovaVariables - 1');
     const androidManifestXml = et.parse(fs.readFileSync(androidManifestPath, 'utf-8'));
     const androidManifestNode = androidManifestXml.getroot();
     let manifestUpdated = false;
-    
+    console.log('processCordovaVariables - 2');
     // Queries permissions
     const packagesToIncludeCSV = context.opts.cli_variables.ANDROID_QUERIES_PACKAGES;
     const actionsToIncludeCSV = context.opts.cli_variables.ANDROID_QUERIES_ACTIONS;
     if (!packagesToIncludeCSV || !actionsToIncludeCSV) {
         // If missing, add queries node
+        console.log('processCordovaVariables - 3');
         let queriestNode = androidManifestNode.find('./queries');
         if (queriestNode == null) {
+            console.log('processCordovaVariables - 4');
             queriestNode = et.Element('queries');
             androidManifestNode.append(queriestNode);
         }
-    
+        console.log('processCordovaVariables - 5');
         if (!packagesToIncludeCSV) {
             packagesToIncludeCSV.split(',').forEach(package => {
+                console.log('processCordovaVariables - 6');
                 if (queriestNode.find(`./package[android:name="${package}"]`) == null) {
+                    console.log('processCordovaVariables - 7');
                     queriestNode.append(et.Element('package', {"android:name": package}));
                     manifestUpdated = true;
                 }
@@ -43,9 +48,9 @@ function processCordovaVariables (context) {
                     
                 if (queriestNode.find(`./intent/action[android:name="${action}"]`) == null) {
                     let intentNode = et.Element('intent');
-                    intentNode.append(et.Element('action', {"android:name": action}));
+                    intentNode.append(et.Element('action', { "android:name": action }));
                     if (mimeType) {
-                        intentNode.append(et.Element('data', {"android:scheme": "content", "android:mimeType": mimeType}));
+                        intentNode.append(et.Element('data', { "android:scheme": "content", "android:mimeType": mimeType }));
                     }
                     queriestNode.append(intentNode);
                     manifestUpdated = true;
@@ -61,7 +66,7 @@ function processCordovaVariables (context) {
     if (!permissionsToIncludeCSV) {
         permissionsToIncludeCSV.split(',').forEach(permission => {
             if (androidManifestNode.find(`./uses-permission[android:name="${permission}"]`) == null) {
-                androidManifestNode.append(et.Element('uses-permission', {"android:name": permission}));
+                androidManifestNode.append(et.Element('uses-permission', { "android:name": permission }));
                 manifestUpdated = true;
             }
         });
@@ -72,8 +77,7 @@ function processCordovaVariables (context) {
     
     // Save updated AndroidManifest
     if (manifestUpdated) {
-        console.log('MANIFEST' + androidManifestXml.toString());
-        fs.writeFileSync(androidManifestPath, androidManifestXml.toString(), 'utf-8');
+        fs.writeFileSync(androidManifestPath, strings.write({ indent: 4 }), 'utf-8');
         console.log('AndroidManifest.xml updated with requested permissions');
     }
 }
