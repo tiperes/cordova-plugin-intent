@@ -16,12 +16,12 @@ function processCordovaVariables (context) {
     let androidManifestRoot = androidManifestXml.getroot();
     let queriesXmlNode = androidManifestRoot.find('./queries');
     if (queriesXmlNode == null) {
-        queriesXmlNode = et.fromstring('<queries/>');
+        queriesXmlNode = et.Element('queries');
         androidManifestRoot.append(queriesXmlNode);
     }
     packagesToIncludeCSV.split(',').forEach(package => {
         if (queriesXmlNode.find(`./package[android:name="${package}"]`) == null) {
-            queriesXmlNode.append(et.fromstring(`<package android:name="${package}"/>`));
+            queriesXmlNode.append(et.Element('package', {"android:name": package}));
         }
     });
 
