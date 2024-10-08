@@ -286,7 +286,7 @@ public class IntentShim extends CordovaPlugin
     {
         PackageManager packageManager = this.cordova.getActivity().getPackageManager();
         if (intent.resolveActivityInfo(packageManager, 0) == null) {
-            throw new RuntimeException("Package not found or not enought permissions to query");
+            throw new RuntimeException("Package not found or not enough permissions to query");
         }
     }
 
@@ -298,7 +298,7 @@ public class IntentShim extends CordovaPlugin
         {
             //  Could do better here - if the app does not already have permission should
             //  only continue when we get the success callback from this.
-            ActivityCompat.requestPermissions(this.cordova.getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            ActivityCompat.requestPermissions(this.cordova.getActivity(), new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             throw new RuntimeException("Please grant read external storage permission");
         }
 
@@ -488,8 +488,7 @@ public class IntentShim extends CordovaPlugin
                 if (type != null) {
                     intent.setType(type);
                 }
-                if (uri != null)
-                {
+                if (uri != null) {
                     intent.setData(uri);
                 }
             }
