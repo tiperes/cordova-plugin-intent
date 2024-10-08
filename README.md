@@ -12,7 +12,7 @@
 - "sendResult" - Normalized parameters processing based in a Intent object, allowing full customization of the result intent to send.
 - Reviewed internal serialization action "populateIntent", to support multiple extra entries with Object values that will be serialized as a Bundle.
 - Full code review to better control exceptions and improve error message details exposure to cordova side.
-- Reviewed plugin hooks to include cordova client variables processing to improve compability and conflit issues.
+- Reviewed plugin.xml to exclude some permissions whitelisting that can be conflituous and added hooks to process cordova client variables processing to deal with this needs.
 
 
 ## Whitelisting Permissions (Android uses-permission)
