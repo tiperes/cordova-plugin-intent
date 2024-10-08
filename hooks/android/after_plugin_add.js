@@ -1,78 +1,64 @@
-const q = require('q');
 const fs = require('fs');
 const path = require('path');
-const xml2js = require('xml2js');
+const et = require('elementtree');
 
-module.exports = function (context) {
-    // Check if any expected client variable is defined
-    const packagesToIncludeCSV = context.opts.cli_variables.ANDROID_QUERIES_PACKAGES;
-    if (!packagesToIncludeCSV) {
-        console.log('ANDROID_QUERIES_PACKAGES variable not provided.');
+// Function to merge the manifests
+function mergeManifests(context) {
+	let removeDuplicates = false;
+	let xmlNodePath2ContentXml = [];
+	Object.keys(context.opts.cli_variables).forEach((name) => {
+		if (name == 'ANDROID_REMOVE_DUPLICATES') {
+			removeDuplicates = context.opts.cli_variables[name] == 'true';
+		} else {
+			xmlNodePath2ContentXml.push(name, context.opts.cli_variables[name]);
+		}
+	});
+	
+	if (xmlNodePath2ContentXml.length == 0) {
+        console.log('No Manifest changes todo.');
         return;
     }
-    
-    const deferral = new q.defer();
+	
+	const androidPlatformRoot = path.join(context.opts.projectRoot, 'platforms/android');
+	const originalManifestPath = path.join(context.opts.projectRoot, 'app/src/main/AndroidManifest.xml');
+    if (!fs.existsSync(originalManifestPath)) {
+        console.error('AndroidManifest.xml not found at:', originalManifestPath);
+        return;
+    }
+	
+    const originalManifestContent = fs.readFileSync(originalManifestPath, 'utf-8');
+    const originalManifestTree = et.parse(originalManifestContent);
+	
+	xmlNodePath2ContentXml.forEach((nodePath) => {
+		// Start by removing duplicates
+		if (removeDuplicates) {
+			const parent = originalManifestTree.find(`{nodePath}/*`);
+			if (parent != null) {
+				var children = parent.getchildren();
+				for (let i = 0; i < children.length; i++) {
+					for (let j = i; j < children.length; j++) {
+						if (et.equalNodes(children[i], children[j])) {
+							originalManifestTree.remove(children[j]);
+							children.splice(j, 1);
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		// Append only if the node does not exist already
+		const nodeChildren = et.parse(`<root>{xmlNodePath2ContentXml[nodePath]}</root>`).getchildren();
+		if (nodeChildren.length > 0) {
+			et.graftXML(originalManifestTree, nodeContent.getchildren(), nodePath);
+		}
+	});
 
-    // Path to the AndroidManifest.xml file
-    const manifestPath = path.join(context.opts.projectRoot, 'platforms', 'android', 'app', 'src', 'main', 'AndroidManifest.xml');
-    // Read AndroidManifest.xml
-    fs.readFile(manifestPath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Failed to read AndroidManifest.xml:', err);
-            deferral.reject();
-            return;
-        }
+    // Write the updated manifest back to the original file
+    fs.writeFileSync(originalManifestPath, originalManifestTree.write({ indent: 4 }), 'utf-8');
+    console.log('AndroidManifest.xml successfully updated.');
+}
 
-        // Parse the XML to JavaScript object
-        xml2js.parseString(data, (err, result) => {
-            if (err) {
-                console.error('Failed to parse AndroidManifest.xml:', err);
-                deferral.reject();
-                return;
-            }
-
-            // Check if <queries> element already exists
-            let queriesNode = result.manifest.queries;
-            if (!queriesNode) {
-                // Append <queries> element to the root
-                queriesNode = [];
-                result.manifest.queries = queriesNode;
-            } else {
-                console.log('<queries> node already exists.');
-            }
-            
-            // Process the required packages
-            packagesToIncludeCSV.split(',').forEach(packageName => {
-                let packageExists = false;
-                queriesNode.forEach(query => {
-                    if (query.package && query.package.$ && query.package.$['android:name'] == packageName) {
-                        packageExists = true;
-                    }
-                });
-                if (!packageExists) {
-                    queriesNode.push({ package: { $: { 'android:name': packageName } } });
-                    console.log('Added <package android:name="android.intent.action.VIEW" /> to <queries> node.');
-                } else {
-                    console.log('<package android:name="android.intent.action.VIEW" /> already exists.');
-                }
-            });
-
-            // Convert the updated JavaScript object back to XML
-            const builder = new xml2js.Builder();
-            const updatedManifest = builder.buildObject(result);
-
-            // Write the updated XML back to AndroidManifest.xml
-            fs.writeFile(manifestPath, updatedManifest, 'utf8', (err) => {
-                if (err) {
-                    console.error('Failed to write AndroidManifest.xml:', err);
-                    deferral.reject();
-                } else {
-                    console.log('Successfully updated AndroidManifest.xml with <queries> node.');
-                    deferral.resolve();
-                }
-            });
-        });
-    });
-
-    return deferral.promise;
-};
+module.exports = function (context) {
+    mergeManifests(context);
+}
