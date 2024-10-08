@@ -32,7 +32,7 @@ function mergeManifests(context) {
     xmlNodePath2ContentXml.forEach((nodePath) => {
         // Start by removing duplicates
         if (removeDuplicates) {
-            const parent = originalManifestTree.find(`{nodePath}/*`);
+            const parent = originalManifestTree.find(nodePath + '/*');
             if (parent != null) {
                 var children = parent.getchildren();
                 for (let i = 0; i < children.length; i++) {
@@ -48,8 +48,7 @@ function mergeManifests(context) {
         }
         
         // Append only if the node does not exist already
-        console.log (`<root>{xmlNodePath2ContentXml[nodePath]}</root>`);
-        const nodeChildren = et.parse(`<root>{xmlNodePath2ContentXml[nodePath]}</root>`).getRoot().getchildren();
+        const nodeChildren = et.parse('<root>' + xmlNodePath2ContentXml[nodePath] + '</root>').getRoot().getchildren();
         if (nodeChildren.length > 0) {
             et.graftXML(originalManifestTree, nodeChildren, nodePath);
         }
