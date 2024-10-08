@@ -8,7 +8,7 @@ function androidXUpgrade (context) {
         return;
     
     const androidPlatformRoot = path.join(context.opts.projectRoot, 'platforms/android');
-    const gradlePropertiesPath = path.join(androidPlatformRoot, 'platforms/androidgradle.properties');
+    const gradlePropertiesPath = path.join(androidPlatformRoot, 'gradle.properties');
     
     let gradlePropertiesStr = fs.readFileSync(gradlePropertiesPath, 'utf-8');
     if (gradlePropertiesStr) {
