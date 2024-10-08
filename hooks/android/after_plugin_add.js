@@ -51,7 +51,7 @@ function processCordovaVariables (context) {
                     manifestUpdated = true;
                 }
             });
-            console.log('ANDROID_QUERIES_ACTIONS configured: ' + packagesToIncludeCSV);
+            console.log('ANDROID_QUERIES_ACTIONS configured: ' + actionsToIncludeCSV);
         } else {
             console.log('ANDROID_QUERIES_ACTIONS not provided.');
         }
@@ -72,6 +72,7 @@ function processCordovaVariables (context) {
     
     // Save updated AndroidManifest
     if (manifestUpdated) {
+        console.log('MANIFEST' + androidManifestXml.toString());
         fs.writeFileSync(androidManifestPath, androidManifestXml.toString(), 'utf-8');
         console.log('AndroidManifest.xml updated with requested permissions');
     }
