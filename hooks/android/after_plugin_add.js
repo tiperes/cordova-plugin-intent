@@ -3,9 +3,9 @@ const path = require('path');
 const et = require('elementtree');
 
 function processCordovaVariables (context) {
-    const packagesToIncludeCSV = context.opts.cli_variables.CORDOVA_ANDROID_PACKAGES;
+    const packagesToIncludeCSV = context.opts.cli_variables.ANDROID_QUERIES_PACKAGES;
     if (!packagesToIncludeCSV) {
-        console.log('CORDOVA_ANDROID_PACKAGES variable not provided.');
+        console.log('ANDROID_QUERIES_PACKAGES variable not provided.');
         return;
     }
     
