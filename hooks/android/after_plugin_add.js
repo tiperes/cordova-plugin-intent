@@ -48,6 +48,7 @@ function mergeManifests(context) {
         }
         
         // Append only if the node does not exist already
+        console.log (`<root>{xmlNodePath2ContentXml[nodePath]}</root>`);
         const nodeChildren = et.parse(`<root>{xmlNodePath2ContentXml[nodePath]}</root>`).getRoot().getchildren();
         if (nodeChildren.length > 0) {
             et.graftXML(originalManifestTree, nodeChildren, nodePath);
