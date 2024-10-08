@@ -282,7 +282,7 @@ public class IntentShim extends CordovaPlugin
         }
     }
     
-    private boolean resolveActivityPackageOrThrow(Intent intent)
+    private void resolveActivityPackageOrThrow(Intent intent)
     {
         PackageManager packageManager = this.cordova.getActivity().getPackageManager();
         if (intent.resolveActivityInfo(packageManager, 0) == null) {
