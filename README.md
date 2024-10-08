@@ -22,8 +22,8 @@ Offer the flexibility to control uses-permission in the Android Manifest using c
 ```
 For Android:
 ```
---variable ANDROID_USES_PERMISSIONS="android.permission.READ_EXTERNAL_STORAGE,android.permission.READ_MEDIA_IMAGES"
-```
+--variable ANDROID_USES_PERMISSIONS = "android.permission.READ_EXTERNAL_STORAGE,android.permission.READ_MEDIA_IMAGES"
+
 Will change the AndroidManifest.xml file to:
 ```XML
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -41,8 +41,8 @@ Refer to:
 ```
 For Android:
 ```
---variable ANDROID_QUERIES_PACKAGES="com.facebook.android,com.twitter.android"
-```
+--variable ANDROID_QUERIES_PACKAGES = "com.facebook.android,com.twitter.android"
+
 Will change the AndroidManifest.xml file to:
 ```XML
 <queries>
@@ -58,8 +58,8 @@ Offer the flexibility to control queries/intent in the Android Manifest using co
 ```
 For Android:
 ```
---variable ANDROID_QUERIES_ACTIONS="android.intent.action.SEND|text/*,android.intent.action.VIEW"
-```
+--variable ANDROID_QUERIES_ACTIONS = "android.intent.action.SEND|text/*,android.intent.action.VIEW"
+
 Will change the AndroidManifest.xml file to:
 ```XML
 <queries>
