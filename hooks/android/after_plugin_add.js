@@ -1,64 +1,82 @@
-const fs = require('fs');
+const fs = require("fs");
 const path = require('path');
 const et = require('elementtree');
 
-// Function to merge the manifests
-function mergeManifests(context) {
-    let removeDuplicates = false;
-    let xmlNodePath2ContentXml = [];
-    Object.keys(context.opts.cli_variables).forEach((name) => {
-        if (name == 'ANDROID_REMOVE_DUPLICATES') {
-            removeDuplicates = context.opts.cli_variables[name] == 'true';
-        } else {
-            xmlNodePath2ContentXml.push(name, context.opts.cli_variables[name]);
-        }
-    });
-    
-    if (xmlNodePath2ContentXml.length == 0) {
-        console.log('No Manifest changes todo.');
-        return;
-    }
-    
+function processCordovaVariables (context) {
+	// Base paths
     const androidPlatformRoot = path.join(context.opts.projectRoot, 'platforms/android');
-    const originalManifestPath = path.join(androidPlatformRoot, 'app/src/main/AndroidManifest.xml');
-    if (!fs.existsSync(originalManifestPath)) {
-        console.error('AndroidManifest.xml not found at:', originalManifestPath);
-        return;
+    const androidManifestPath = path.join(androidPlatformRoot, 'app/src/main/AndroidManifest.xml');
+    
+	// Init AndroidManifest control
+    const androidManifestXml = et.parse(fs.readFileSync(androidManifestPath, 'utf-8'));
+    const androidManifestNode = androidManifestXml.getroot();
+	let manifestUpdated = false;
+	
+	// Queries permissions
+	const packagesToIncludeCSV = context.opts.cli_variables.ANDROID_QUERIES_PACKAGES;
+	const actionsToIncludeCSV = context.opts.cli_variables.ANDROID_QUERIES_ACTIONS;
+	if (!packagesToIncludeCSV || !actionsToIncludeCSV) {
+		// If missing, add queries node
+		let queriestNode = androidManifestNode.find('./queries');
+		if (queriestNode == null) {
+			queriestNode = et.Element('queries');
+			androidManifestNode.append(queriestNode);
+		}
+	
+		if (!packagesToIncludeCSV) {
+			packagesToIncludeCSV.split(',').forEach(package => {
+				if (queriestNode.find(`./package[android:name="${package}"]`) == null) {
+					queriestNode.append(et.Element('package', {"android:name": package}));
+					manifestUpdated = true;
+				}
+			});
+			console.log('ANDROID_QUERIES_PACKAGES configured: ' + packagesToIncludeCSV);
+		} else {
+			console.log('ANDROID_QUERIES_PACKAGES not provided.');
+		}
+		
+		if (!actionsToIncludeCSV) {
+			actionsToIncludeCSV.split(',').forEach(actionMimeType => {
+				const actionMimeTypeSplit = actionMimeType.split('|');
+				const action = actionMimeTypeSplit[0];
+				const mimeType = actionMimeTypeSplit.length == 1 ? '' : actionMimeTypeSplit[1];
+					
+				if (queriestNode.find(`./intent/action[android:name="${action}"]`) == null) {
+					let intentNode = et.Element('intent');
+					intentNode.append(et.Element('action', {"android:name": action}));
+					if (mimeType) {
+						intentNode.append(et.Element('data', {"android:scheme": "content", "android:mimeType": mimeType}));
+					}
+					queriestNode.append(intentNode);
+					manifestUpdated = true;
+				}
+			});
+			console.log('ANDROID_QUERIES_ACTIONS configured: ' + packagesToIncludeCSV);
+		} else {
+			console.log('ANDROID_QUERIES_ACTIONS not provided.');
+		}
+	}
+	
+	const permissionsToIncludeCSV = context.opts.cli_variables.ANDROID_USES_PERMISSIONS;
+    if (!permissionsToIncludeCSV) {
+		permissionsToIncludeCSV.split(',').forEach(permission => {
+			if (androidManifestNode.find(`./uses-permission[android:name="${permission}"]`) == null) {
+				androidManifestNode.append(et.Element('uses-permission', {"android:name": permission}));
+				manifestUpdated = true;
+			}
+		});
+        console.log('ANDROID_USES_PERMISSIONS configured: ' + permissionsToIncludeCSV);
+    } else {
+        console.log('ANDROID_USES_PERMISSIONS not provided.');
     }
     
-    const originalManifestContent = fs.readFileSync(originalManifestPath, 'utf-8');
-    const originalManifestTree = et.parse(originalManifestContent);
-    
-    xmlNodePath2ContentXml.forEach((nodePath) => {
-        // Start by removing duplicates
-        if (removeDuplicates) {
-            const parent = originalManifestTree.find(nodePath + '/*');
-            if (parent != null) {
-                var children = parent.getchildren();
-                for (let i = 0; i < children.length; i++) {
-                    for (let j = i; j < children.length; j++) {
-                        if (et.equalNodes(children[i], children[j])) {
-                            originalManifestTree.remove(children[j]);
-                            children.splice(j, 1);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        
-        // Append only if the node does not exist already
-        const nodeChildren = et.parse('<root>' + xmlNodePath2ContentXml[nodePath] + '</root>').getRoot().getchildren();
-        if (nodeChildren.length > 0) {
-            et.graftXML(originalManifestTree, nodeChildren, nodePath);
-        }
-    });
-
-    // Write the updated manifest back to the original file
-    fs.writeFileSync(originalManifestPath, originalManifestTree.write({ indent: 4 }), 'utf-8');
-    console.log('AndroidManifest.xml successfully updated.');
+	// Save updated AndroidManifest
+	if (manifestUpdated) {
+		fs.writeFileSync(androidManifestPath, androidManifestXml.toString(), 'utf-8');
+        console.log('AndroidManifest.xml updated with requested permissions');
+	}
 }
 
 module.exports = function (context) {
-    mergeManifests(context);
-}
+    processCordovaVariables(context);
+};
