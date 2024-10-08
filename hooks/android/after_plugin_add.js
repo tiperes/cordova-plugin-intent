@@ -51,11 +51,11 @@ module.exports = function (context) {
             
             if (packagesToIncludeCSV || actionsToIncludeCSV) {
                 // Check if <queries> element already exists
-                let queriesNode = result.['manifest']['queries'];
+                let queriesNode = result['manifest']['queries'];
                 if (!queriesNode) {
                     // Append <queries> element to the root
                     queriesNode = [];
-                    result.['manifest']['queries'] = queriesNode;
+                    result['manifest']['queries'] = queriesNode;
                 } else {
                     console.log('<queries> node already exists.');
                 }
@@ -129,7 +129,7 @@ module.exports = function (context) {
             // Process the required packages
             if (permissionsToIncludeCSV) {
                 permissionsToIncludeCSV.split(',').forEach(permissionName => {
-                    let permissionsNode = result.['manifest']['uses-permission'];
+                    let permissionsNode = result['manifest']['uses-permission'];
                     if (!permissionsNode) {
                         // Append <uses-permission> element to the root
                         permissionsNode = [];
