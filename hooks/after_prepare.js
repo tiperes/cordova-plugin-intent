@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require('path');
 const et = require('elementtree');
 
 // Enable support for AndroidX & Jetifier
