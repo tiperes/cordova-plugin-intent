@@ -34,8 +34,13 @@ module.exports = {
         exec(callback, errorCallback, "IntentShim", "registerBroadcastReceiver", [arg]);
     },
     unregisterBroadcastReceiver: function (arg) {
-        argscheck.checkArgs('s', 'IntentShim.unregisterBroadcastReceiver', arguments);
-        exec(null, null, "IntentShim", "unregisterBroadcastReceiver", [arg || ""]);
+        if (arguments.length == 0) {
+            arg = '';
+        }
+        else {
+            argscheck.checkArgs('s', 'IntentShim.unregisterBroadcastReceiver', arguments);
+        }
+        exec(null, null, "IntentShim", "unregisterBroadcastReceiver", [arg]);
     },
     onIntent: function (callback, errorCallback) {
         argscheck.checkArgs('ff', 'IntentShim.onIntent', arguments);
