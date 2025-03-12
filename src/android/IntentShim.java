@@ -204,7 +204,7 @@ public class IntentShim extends CordovaPlugin
             else if (action.equals("unregisterBroadcastReceiver"))
             {
                 String uuid = args.getString(0);
-                if (uuid == "" )
+                if (uuid.isEmpty())
                 {
                     // Unregister all registered broadcast receivers
                     for (UniqueBroadcastReceiver broadcastReceiver:  new ArrayList<>(broadcastReceivers.values())) {
