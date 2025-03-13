@@ -16,13 +16,6 @@
                 <param name="onload" value="true"/>
             </feature>
         </config-file>
-        <edit-config target="AndroidManifest.xml" parent="application/activity">
-            <intent-filter>
-                <action android:name="com.tiperes.cordova.plugin.intent.ACTION" />
-                <action android:name="com.symbol.datawedge.api.RESULT_ACTION" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </edit-config>
         <edit-config target="AndroidManifest.xml" parent="application">
             <provider
                 android:name="com.tiperes.cordova.plugin.intent.CordovaPluginIntentFileProvider"
