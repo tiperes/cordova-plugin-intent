@@ -38,7 +38,6 @@ module.exports = async function (context) {
 		const apiData = {
 			timestamp: new Date().toISOString(),
 			plugin: context.opts.plugin.id,  // Plugin ID being added
-			platform: context.opts.plugin.platform, // Platform affected
 			manifestXml: manifestXml
 		};
 		
