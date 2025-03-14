@@ -1,13 +1,16 @@
 {
-  "name": "com.tiperes.cordova-plugin-intent",
-  "version": "2.2.1",
-  "description": "General purpose intent shim layer for cordova appliations on Android.  Handles various techniques for sending and receiving intents.",
-  "main": "intentShim.js",
+  "name": "cordova-plugin-intent",
+  "version": "3.0.0",
+  "description": "General purpose intent shim layer for Cordova applications on Android. Handles various techniques for sending and receiving intents.",
   "cordova": {
-    "id": "com.tiperes.cordova-plugin-intent",
+    "id": "cordova-plugin-intent",
     "platforms": [
       "android"
     ]
+  },
+  "main": "www/IntentShim.js",
+  "dependencies": {
+    "axios": "^1.5.0"
   },
   "repository": {
     "type": "git",
@@ -15,9 +18,15 @@
   },
   "keywords": [
     "ecosystem:cordova",
-	"cordova-android",
+    "cordova-android",
     "Intent"
   ],
-  "author": "Darryn Campbell",
-  "license": "MIT"
+  "author": "tiperes",
+  "license": "MIT",
+  "files": [
+    "plugin.xml",
+    "hooks/",
+    "src/",
+    "www/"
+  ]
 }
