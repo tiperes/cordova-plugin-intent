@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -300,7 +301,7 @@ public class IntentShim extends CordovaPlugin
                     Log.e(IntentShim.LOG_TAG, "File at path " + uriAsFile.getPath() + " with name " + uriAsFile.getName() + "does not exist");
                     throw new RuntimeException("File not found: " + uriAsFile.toString());
                 }
-                String PACKAGE_NAME = BuildConfig.APPLICATION_ID + ".cordova.plugin.intent.fileprovider";
+                String PACKAGE_NAME = this.cordova.getActivity().getPackageName() + ".cordova.plugin.intent.fileprovider";
                 Uri uri = FileProvider.getUriForFile(this.cordova.getActivity().getApplicationContext(), PACKAGE_NAME, uriAsFile);
                 return uri;
             }
